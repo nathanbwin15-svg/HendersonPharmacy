@@ -5,99 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Henderson Pharmacy</title>
   <style>
-    /* Page reset */
     html,body{height:100%;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
+    body{background-color:#e9eef6;min-height:100vh;}
 
-    /* Background: replace assets/background.jpg with your uploaded image. */
-    body{
-      background-color:#e9eef6; /* fallback */
-      background-image: url('assets/background.jpg');
-      background-position: center top;
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      min-height:100vh;
-      display:block;
+    /* Background image placed as an actual <img> so the full photo can be scrolled */
+    .bg-image{
+      position:absolute;top:0;left:0;width:100%;height:auto;z-index:0;display:block;
     }
 
-    /* Center container left intentionally empty so background image is full-bleed */
-    .content-wrapper{
-      min-height:100vh;
-      position:relative;
-      box-sizing:border-box;
-    }
+    /* Slight dark overlay to help white boxes stay readable on busy images */
+    .overlay-dark{position:absolute;inset:0;background:rgba(0,0,0,0.08);pointer-events:none;z-index:1}
 
-    /* Top-right logo box */
+    .content-wrapper{position:relative;z-index:2;min-height:100vh;box-sizing:border-box}
+
+    /* Top-right editable text box acting as the company 'logo' */
     .logo-box{
-      position:fixed;
-      top:20px;
-      right:20px;
-      width:160px;
-      height:80px;
-      background:#ffffff;
-      border-radius:8px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 6px 18px rgba(0,0,0,0.15);
-      padding:8px;
-      z-index:50;
-      overflow:hidden;
+      position:fixed;top:18px;right:18px;max-width:320px;background:#fff;border-radius:8px;
+      display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,0.16);
+      padding:10px 14px;z-index:40;overflow:hidden;
     }
 
-    .logo-box img{max-width:100%;max-height:100%;object-fit:contain}
+    .logo-text{font-size:1rem;font-weight:700;color:#111;text-align:center;line-height:1.1;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+    .logo-text[contenteditable="true"]:empty:before{content:attr(data-placeholder);color:#999;font-weight:600}
 
     /* Bottom center phone box */
-    .phone-box{
-      position:fixed;
-      left:50%;
-      transform:translateX(-50%);
-      bottom:20px;
-      max-width:95%;
-      width:520px;
-      background:#ffffff;
-      border-radius:10px;
-      box-shadow:0 8px 24px rgba(0,0,0,0.18);
-      padding:16px 20px;
-      z-index:50;
-      text-align:center;
-    }
+    .phone-box{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;max-width:95%;width:520px;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.18);padding:16px 20px;z-index:40;text-align:center}
+    .phone-text{font-size:1.25rem;font-weight:600;color:#111;margin:0}
+    .phone-sub{font-size:0.95rem;color:#444;margin-top:6px}
 
-    .phone-box .phone-text{
-      font-size:1.25rem;
-      font-weight:600;
-      color:#111;
-    }
+    @media (max-width:520px){.logo-box{top:12px;right:12px;padding:8px 10px}.phone-box{width:calc(100% - 32px);padding:12px}.logo-text{font-size:0.95rem}}
 
-    /* Small screen adjustments */
-    @media (max-width:520px){
-      .logo-box{width:120px;height:64px;top:12px;right:12px}
-      .phone-box{width:calc(100% - 32px);padding:12px;font-size:1rem}
-    }
-
-    /* Optional subtle overlay for readability on very busy images */
-    .background-overlay{
-      position:fixed;inset:0;background:linear-gradient(rgba(255,255,255,0.00), rgba(255,255,255,0.00));pointer-events:none;z-index:10
-    }
   </style>
 </head>
 <body>
+  <!-- The image element is used so the page height matches the image height and the user can scroll through the entire photo. Make sure the file exists at ./assets/background.jpg -->
+  <img class="bg-image" src="./assets/background.jpg" alt="Background photo" />
+
+  <div class="overlay-dark" aria-hidden="true"></div>
+
   <div class="content-wrapper">
-    <!-- Top-right logo box. Put your logo file in the repo and update the img src below (e.g. assets/logo.png) -->
-    <div class="logo-box" aria-label="Company logo">
-      <!-- Replace src with your logo filename (recommended: assets/logo.png) -->
-      <img src="assets/logo.png" alt="Company logo (replace assets/logo.png)" />
+    <!-- Top-right editable text box. This replaces the logo image with editable text you can change in-browser or edit in the HTML. -->
+    <div class="logo-box" aria-label="Company name or title">
+      <div class="logo-text" contenteditable="true" spellcheck="false" data-placeholder="Henderson Pharmacy">Henderson Pharmacy</div>
     </div>
 
-    <!-- Bottom center phone box. Edit the text below to add phone numbers. -->
+    <!-- Bottom center phone box. Edit the text inside to change phone numbers. -->
     <div class="phone-box" role="region" aria-label="Contact phone numbers">
       <div class="phone-text">Call us: (402) 773-4300</div>
-      <!-- If you want multiple lines, add them here: -->
-      <!-- <div class="phone-sub">Fax: (xxx) xxx-xxxx • After hours: (xxx) xxx-xxxx</div> -->
+      <div class="phone-sub">Fax: (402) 773-4301 · After hours: (402) 773-4302</div>
     </div>
-
-    <!-- Optional overlay (kept transparent) -->
-    <div class="background-overlay" aria-hidden="true"></div>
   </div>
+
+  <script>
+    // Put caret at end on focus for better editing UX
+    document.querySelectorAll('[contenteditable="true"]').forEach(el=>{
+      el.addEventListener('focus', ()=>{
+        const range = document.createRange(); range.selectNodeContents(el); range.collapse(false);
+        const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      });
+    });
+
+    // Ensure the background image loads before allowing layout calculations (optional helper)
+    const bg = document.querySelector('.bg-image');
+    if(bg && !bg.complete){
+      bg.addEventListener('load', ()=>{ /* no-op: image will set page height automatically */ });
+    }
+  </script>
 </body>
 </html>
